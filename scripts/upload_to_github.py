@@ -37,11 +37,15 @@ class GitHubUploader:
                 shell=True,
                 check=check,
                 capture_output=capture_output,
-                text=True
+                text=True,
+                encoding='utf-8',
+                errors='ignore'  # 忽略编码错误
             )
-            return result.stdout.strip() if capture_output else None
+            if capture_output and result.stdout:
+                return result.stdout.strip()
+            return None
         except subprocess.CalledProcessError as e:
-            if capture_output:
+            if capture_output and hasattr(e, 'stderr') and e.stderr:
                 print(f"❌ 命令执行失败: {e.stderr}")
             raise
     
@@ -103,15 +107,19 @@ class GitHubUploader:
         if git_dir.exists():
             print("   Git仓库已存在")
         else:
-            self.run_command("git init")
-            self.run_command("git branch -M main")
+            self.run_command("git init", capture_output=False)
+            self.run_command("git branch -M main", capture_output=False)
             print("   ✅ Git仓库初始化完成")
     
     def add_files(self):
         """添加文件到Git"""
         print("\n📝 添加文件到Git...")
-        self.run_command("git add .")
-        print("   ✅ 文件已添加")
+        try:
+            self.run_command("git add .", capture_output=False)
+            print("   ✅ 文件已添加")
+        except subprocess.CalledProcessError as e:
+            print(f"   ⚠️  部分文件添加可能失败，继续...")
+            pass
     
     def create_commit(self):
         """创建提交"""
@@ -119,12 +127,22 @@ class GitHubUploader:
         
         # 配置用户信息
         self.run_command(f'git config user.email "{self.username}"')
-        self.run_command(f'git config user.name "{self.username.split("@")[0]}"')
+        username_part = self.username.split("@")[0] if "@" in self.username else self.username
+        self.run_command(f'git config user.name "{username_part}"')
         
-        commit_message = "Initial commit: 完整的分布式软总线项目框架\n\n包含:\n- softbus-core: 核心库\n- softbus-network: 网络抽象层\n- softbus-idl-compiler: IDL编译器\n- native: 原生平台代码\n- examples: 示例应用\n- docs: 完整文档"
+        # 使用简单的提交信息避免多行问题
+        commit_message = "Initial commit: 完整的分布式软总线项目框架"
         
-        self.run_command(f'git commit -m "{commit_message}"')
-        print("   ✅ 提交已创建")
+        try:
+            self.run_command(f'git commit -m "{commit_message}"', capture_output=False)
+            print("   ✅ 提交已创建")
+        except subprocess.CalledProcessError:
+            # 检查是否已经有提交
+            try:
+                self.run_command("git rev-parse HEAD")
+                print("   ℹ️  已存在提交，跳过创建")
+            except:
+                raise
     
     def check_github_repo_exists(self):
         """检查GitHub仓库是否存在"""
@@ -160,10 +178,10 @@ class GitHubUploader:
         try:
             self.run_command("git remote get-url origin")
             print("   更新远程仓库URL...")
-            self.run_command(f'git remote set-url origin "{repo_url}"')
+            self.run_command(f'git remote set-url origin "{repo_url}"', capture_output=False)
         except:
             print("   添加远程仓库...")
-            self.run_command(f'git remote add origin "{repo_url}"')
+            self.run_command(f'git remote add origin "{repo_url}"', capture_output=False)
         
         print("   ✅ 远程仓库已配置")
     
@@ -189,7 +207,7 @@ class GitHubUploader:
         print("\n🔒 清理凭证...")
         try:
             clean_url = f"https://github.com/{self.github_username}/{self.repo_name}.git"
-            self.run_command(f'git remote set-url origin "{clean_url}"')
+            self.run_command(f'git remote set-url origin "{clean_url}"', capture_output=False)
             print("   ✅ 凭证已清理")
         except:
             pass
