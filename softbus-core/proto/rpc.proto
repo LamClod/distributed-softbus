@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package softbus.rpc;
+
+// RPC请求消息
+message RpcRequest {
+    string request_id = 1;      // 请求ID
+    string service_name = 2;    // 服务名称
+    string method_name = 3;     // 方法名称
+    bytes payload = 4;          // 序列化的参数
+    map<string, string> metadata = 5;  // 元数据
+}
+
+// RPC响应消息
+message RpcResponse {
+    string request_id = 1;      // 对应的请求ID
+    bool success = 2;           // 是否成功
+    bytes payload = 3;          // 序列化的返回值
+    string error_message = 4;   // 错误信息
+    map<string, string> metadata = 5;  // 元数据
+}
+
+// RPC错误码
+enum RpcErrorCode {
+    OK = 0;
+    TIMEOUT = 1;
+    SERVICE_NOT_FOUND = 2;
+    METHOD_NOT_FOUND = 3;
+    SERIALIZATION_ERROR = 4;
+    NETWORK_ERROR = 5;
+    INTERNAL_ERROR = 6;
+}

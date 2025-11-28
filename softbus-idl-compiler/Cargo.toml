@@ -1,0 +1,29 @@
+[package]
+name = "softbus-idl-compiler"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "softbus-idl-compiler"
+path = "src/main.rs"
+
+[dependencies]
+# Workspace依赖
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+
+# CLI工具
+clap = { version = "4.4", features = ["derive"] }
+
+# 模板引擎
+handlebars = "5.0"
+
+# 词法分析
+logos = "0.13"
+
+[dev-dependencies]
+tempfile = "3.8"

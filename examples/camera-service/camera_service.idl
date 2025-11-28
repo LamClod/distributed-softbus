@@ -1,0 +1,18 @@
+// 分布式相机服务IDL定义
+
+service CameraService {
+    // 打开相机
+    open(camera_id: i32) -> bool;
+    
+    // 关闭相机
+    close() -> bool;
+    
+    // 拍照
+    capture() -> bytes;
+    
+    // 获取相机列表
+    list_cameras() -> array<string>;
+    
+    // 设置相机参数
+    set_parameter(key: string, value: string) -> bool;
+}

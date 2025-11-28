@@ -1,0 +1,27 @@
+# Rust
+/target
+**/*.rs.bk
+Cargo.lock
+
+# IDL生成代码
+**/generated/
+
+# 原生构建产物
+native/windows/bin/
+native/windows/obj/
+native/linux/build/
+native/android/build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 测试输出
+*.pcap
+*.log

@@ -1,0 +1,39 @@
+[package]
+name = "softbus-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+# Workspace依赖
+tokio.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+bincode.workspace = true
+prost.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+bytes.workspace = true
+ring.workspace = true
+rustls.workspace = true
+tracing.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+
+# 本地依赖
+softbus-network = { path = "../softbus-network" }
+
+[build-dependencies]
+prost-build.workspace = true
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = "0.5"
+
+[[bench]]
+name = "rpc_bench"
+harness = false

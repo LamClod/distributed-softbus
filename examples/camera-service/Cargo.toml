@@ -1,0 +1,20 @@
+[package]
+name = "camera-service"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+softbus-core = { path = "../../softbus-core" }
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+
+[[bin]]
+name = "camera-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "camera-client"
+path = "src/client.rs"

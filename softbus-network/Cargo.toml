@@ -1,0 +1,28 @@
+[package]
+name = "softbus-network"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+# Workspace依赖
+tokio.workspace = true
+async-trait.workspace = true
+bytes.workspace = true
+tracing.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+btleplug.workspace = true
+mdns-sd.workspace = true
+socket2.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+nix.workspace = true
+libc.workspace = true
+
+[dev-dependencies]
+tokio-test = "0.4"

@@ -1,0 +1,89 @@
+[workspace]
+members = [
+    "softbus-core",
+    "softbus-network",
+    "softbus-idl-compiler",
+    "examples/camera-service",
+    "examples/file-transfer",
+    "examples/remote-control",
+]
+
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Your Team <team@example.com>"]
+repository = "https://github.com/yourorg/distributed-softbus"
+
+[workspace.dependencies]
+# 异步运行时
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+prost = "0.12"
+prost-build = "0.12"
+
+# gRPC（可选）
+tonic = { version = "0.11", optional = true }
+tonic-build = { version = "0.11", optional = true }
+
+# 并发数据结构
+dashmap = "5.5"
+parking_lot = "0.12"
+
+# 网络
+bytes = "1.5"
+socket2 = "0.5"
+
+# 加密
+ring = "0.17"
+rustls = "0.22"
+rustls-pemfile = "2.0"
+
+# 日志
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# 错误处理
+thiserror = "1.0"
+anyhow = "1.0"
+
+# 工具
+uuid = { version = "1.6", features = ["v4"] }
+chrono = "0.4"
+hex = "0.4"
+
+# BLE
+btleplug = "0.11"
+
+# mDNS
+mdns-sd = "0.7"
+
+# Windows特定
+[target.'cfg(windows)'.workspace.dependencies]
+windows = { version = "0.52", features = [
+    "Devices_Bluetooth",
+    "Devices_Bluetooth_Advertisement",
+    "Devices_Bluetooth_GenericAttributeProfile",
+] }
+
+# Unix特定
+[target.'cfg(unix)'.workspace.dependencies]
+nix = { version = "0.27", features = ["net"] }
+libc = "0.2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
