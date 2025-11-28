@@ -162,9 +162,12 @@ class GitHubUploader:
         print(f"\n   如果还未创建，请访问:")
         print(f"   🔗 https://github.com/new")
         print(f"   - Repository name: {self.repo_name}")
-        print(f"   - 不要勾选 'Initialize this repository with a README'")
+        print(f"   - ⚠️  【重要】不要勾选 'Add a README file'")
+        print(f"   - ⚠️  【重要】不要勾选 'Add .gitignore'")
+        print(f"   - ⚠️  【重要】不要勾选 'Choose a license'")
+        print(f"   - 仓库必须是完全空的!")
         
-        confirm = input("\n   仓库已创建? (y/n): ").lower()
+        confirm = input("\n   仓库已创建且为空? (y/n): ").lower()
         return confirm == 'y'
     
     def add_remote(self):
@@ -191,16 +194,41 @@ class GitHubUploader:
         print("   这可能需要几分钟时间...")
         
         try:
-            # 推送到main分支
+            # 首先尝试正常推送
             self.run_command("git push -u origin main", capture_output=False)
             print("\n   ✅ 推送成功!")
             return True
-        except subprocess.CalledProcessError:
-            print("\n   ❌ 推送失败，可能的原因:")
-            print("      1. Token权限不足")
-            print("      2. 仓库不存在")
-            print("      3. 网络问题")
-            return False
+        except subprocess.CalledProcessError as e:
+            print("\n   ⚠️  常规推送失败，检测问题原因...")
+            
+            # 检查是否是因为远程有内容
+            print("\n   可能的原因:")
+            print("      1. 远程仓库已有内容（创建时添加了README等）")
+            print("      2. Token权限不足")
+            print("      3. 网络问题（502等）")
+            
+            print("\n   🔧 尝试解决方案...")
+            force = input("\n   是否强制推送（会覆盖远程内容）? (y/n): ").lower()
+            
+            if force == 'y':
+                try:
+                    print("   ⚡ 执行强制推送...")
+                    self.run_command("git push -u origin main --force", capture_output=False)
+                    print("\n   ✅ 强制推送成功!")
+                    return True
+                except subprocess.CalledProcessError:
+                    print("\n   ❌ 强制推送也失败了")
+                    print("      请检查:")
+                    print("      - Token是否有效（访问 https://github.com/settings/tokens 查看）")
+                    print("      - 网络连接是否正常")
+                    print("      - GitHub服务状态（访问 https://www.githubstatus.com）")
+                    return False
+            else:
+                print("\n   💡 建议手动操作:")
+                print("      1. 删除GitHub上的仓库")
+                print("      2. 重新创建空仓库（不要添加任何文件）")
+                print("      3. 重新运行此脚本")
+                return False
     
     def cleanup_credentials(self):
         """清理URL中的token"""
